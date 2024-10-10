@@ -11,6 +11,6 @@ class Triangle():
         return 1/2 * self.base * self.height
     
     def __str__(self):
-        print(f"Triangle: base={self.base}, height={self.height}")
+        return f"Triangle: base={self.base}, height={self.height}"
 
     
