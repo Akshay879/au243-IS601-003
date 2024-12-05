@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import sqlite3
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -32,6 +33,39 @@ def get_db_connection():
     return conn
 
 # Customers Endpoints
+@app.get("/customers")
+def list_customers(
+    skip: int = 0, 
+    limit: int = 10, 
+    name: Optional[str] = None, 
+    phone: Optional[str] = None
+):
+    
+    if skip < 0 or limit < 1:
+        raise HTTPException(status_code=422, detail="Invalid pagination parameters.")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = "SELECT * FROM customers WHERE 1=1"
+    params = []
+    if name:
+        query += " AND name LIKE ?"
+        params.append(f"%{name}%")
+    
+    if phone:
+        query += " AND phone LIKE ?"
+        params.append(f"%{phone}%")
+    query += " LIMIT ? OFFSET ?"
+    params.extend([limit, skip])
+    
+    cursor.execute(query, tuple(params))
+    customers = cursor.fetchall()
+    conn.close()
+    
+    return {
+        "customers": [{"id": customer[0], "name": customer[1], "phone": customer[2]} for customer in customers]
+    }
+
 @app.post("/customers")
 def create_customer(customer: Customer):
     conn = get_db_connection()
@@ -74,7 +108,33 @@ def delete_customer(id: int):
     conn.close()
     return {"message": "Customer deleted successfully."}
 
-# Items Endpoints
+# Items Endpoints with Pagination and Filtering
+@app.get("/items")
+def list_items(skip: int = 0, limit: int = 10, name: Optional[str] = None, min_price: Optional[float] = None, max_price: Optional[float] = None):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    query = "SELECT * FROM items WHERE 1=1"
+    
+    params = []
+    if name:
+        query += " AND name LIKE ?"
+        params.append(f"%{name}%")
+    if min_price:
+        query += " AND price >= ?"
+        params.append(min_price)
+    if max_price:
+        query += " AND price <= ?"
+        params.append(max_price)
+    
+    query += " LIMIT ? OFFSET ?"
+    params += [limit, skip]
+    
+    cursor.execute(query, params)
+    items = cursor.fetchall()
+    conn.close()
+    
+    return {"items": [dict(item) for item in items]}
+
 @app.post("/items")
 def create_item(item: Item):
     conn = get_db_connection()
@@ -114,6 +174,20 @@ def delete_item(id: int):
     return {"message": "Item deleted successfully."}
 
 # Orders Endpoints
+# GET: List orders with pagination
+@app.get("/orders")
+def list_orders(skip: int = 0, limit: int = 10):
+    if skip < 0 or limit < 1:
+        raise HTTPException(status_code=422, detail="Invalid skip or limit value.")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders LIMIT ? OFFSET ?", (limit, skip))
+    orders = cursor.fetchall()
+    conn.close()
+    
+    return {"orders": [dict(order) for order in orders]}
+
 @app.post("/orders")
 def create_order(order: Order):
     conn = get_db_connection()
