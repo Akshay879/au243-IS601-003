@@ -56,15 +56,14 @@ The API is structured into three major sections:
 
 ### API Endpoints
 1. Customers
-| Method |	Endpoint |	Description
-| GET    | /customers|	List customers with optional filters.
-| POST   | /customers|	Create a new customer.
-| GET    | /customers/{id}|	Retrieve a customer by ID.
-| PUT	 | /customers/{id}|	Update a customer's details by ID.
-| DELETE | /customers/{id}|	Delete a customer by ID.
+- GET  /customers - List customers with optional filters.
+- POST  /customers - Create a new customer.
+- GET   /customers/{id} - Retrieve a customer by ID.
+- PUT	/customers/{id} - Update a customer's details by ID.
+- DELETE /customers/{id} - Delete a customer by ID.
 Example: Create a New Customer
 Request:
-    ```json
+    ```
     POST /customers
     {
     "name": "John Doe",
@@ -72,26 +71,25 @@ Request:
     }
     ```
 Response:
-    ```json
+    ```
     {
     "message": "Customer created successfully."
     }
     ```
 
 2. Items
-|Method	 | Endpoint | Description
-|GET	 | /items	| List items with filters and pagination.
-|POST	 | /items	| Create a new item.
-|GET	 | /items/{id}|	Retrieve an item by ID.
-|PUT	 | /items/{id}|	Update an item by ID.
-|DELETE	 | /items/{id}|	Delete an item by ID.
+- GET  /items - List items with filters and pagination.
+- POST /items -	Create a new item.
+- GET /items/{id} -	Retrieve an item by ID.
+- PUT /items/{id} -	Update an item by ID.
+- DELETE /items/{id} - Delete an item by ID.
 Example: List Items with Filters
 Request:
-    ```json
+    ```
     GET /items?name=phone&min_price=100
     ```
 Response:
-    ```json
+    ```
     {
   "items": [
     {"id": 1, "name": "Smartphone", "price": 299.99},
@@ -101,15 +99,14 @@ Response:
     ```
 
 3. Orders
-|Method | Endpoint|	Description
-|GET	| /orders |	List orders with pagination.
-|POST	| /orders |	Create a new order with items.
-|GET	|/orders/{id}|	Retrieve an order and its items by ID.
-|PUT	|/orders/{id}|	Update an order and its items by ID.
-|DELETE	|/orders/{id}|	Delete an order by ID.
+- GET /orders - List orders with pagination.
+- POST /orders - Create a new order with items.
+- GET /orders/{id} - Retrieve an order and its items by ID.
+- PUT /orders/{id} - Update an order and its items by ID.
+- DELETE /orders/{id} - Delete an order by ID.
 Example: Create a New Order
 Request:
-    ```json
+    ```
     POST /orders
     {
     "customer_id": 1,
@@ -122,7 +119,7 @@ Request:
     }
     ```
 Response:
-    ```json
+    ```
     {
     "message": "Order created successfully."
     }
@@ -132,13 +129,13 @@ Response:
 
 ## Pagination
 Endpoints that support pagination (skip and limit) allow you to fetch records in chunks. For example:
-    ```bash
+    ```
     GET /customers?skip=0&limit=5
     ```
 
 ## Filtering
 Filters (like name, phone, min_price, max_price) allow narrowing down search results. For example:
-    ```bash
+    ```
     GET /items?name=phone&min_price=50&max_price=300
     ```
 
